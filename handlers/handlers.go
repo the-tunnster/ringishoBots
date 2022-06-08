@@ -4,11 +4,14 @@ import (
 	"botStuff/models"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
+	"firebase.google.com/go"
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/opt"
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
+	"google.golang.org/api/option"
 	"googlemaps.github.io/maps"
 )
 
@@ -103,4 +106,36 @@ func AlgoliaBot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(results)
+}
+
+func FirebaseConnector(w http.ResponseWriter, r *http.Request) {
+
+	ctx := context.Background()
+	conf := &firebase.Config{
+		DatabaseURL: "enter database url here",
+	}
+
+	opt := option.WithCredentialsFile("flowing-castle-324702-firebase-adminsdk-w2xqe-5a73d0d705.json")
+
+	app, err := firebase.NewApp(ctx, conf, opt)
+	if err != nil {
+		log.Fatal("Error initializing app: ", err)
+	}
+
+	client, err := app.Database(ctx)
+	if err != nil {
+		log.Fatalln("Error initializing database client: ", err)
+	}
+
+	// As an admin, the app has access to read and write all data, regradless of Security Rules
+	ref := client.NewRef("restricted_access/secret_document")
+
+	var data map[string]interface{}
+
+	if err := ref.Get(ctx, &data); err != nil {
+		log.Fatalln("Error reading from database:", err)
+	}
+
+	fmt.Println(data)
+
 }
