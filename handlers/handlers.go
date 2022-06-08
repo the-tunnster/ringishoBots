@@ -16,8 +16,8 @@ import (
 )
 
 const KEY string = ""
-const AlgoliaAdminKey string = "5d4aa09d1df84fb62ff793d7fcb1b16b"
-const AlgoliaApplicationID string = "2Z19YUPYM0"
+const AlgoliaAdminKey string = ""
+const AlgoliaApplicationID string = ""
 
 func BotSupervisor(w http.ResponseWriter, r *http.Request) {
 	log.Println("Hit BotSupervisorPage Post Endpoint.")
