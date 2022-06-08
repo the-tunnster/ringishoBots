@@ -12,6 +12,7 @@ func routes() http.Handler{
 
 	mux.Get("/bots/123", handlers.TravelBot)
 	mux.Get("/bots/789", handlers.AlgoliaBot)
+	mux.Get("/bots/456", handlers.FirebaseConnector)
 
 	return mux
 }
