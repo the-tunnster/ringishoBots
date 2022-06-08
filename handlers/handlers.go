@@ -4,7 +4,6 @@ import (
 	"botStuff/models"
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -14,8 +13,8 @@ import (
 )
 
 const KEY string = ""
-const AlgoliaAdminKey string = ""
-const AlgoliaApplicationID string = ""
+const AlgoliaAdminKey string = "5d4aa09d1df84fb62ff793d7fcb1b16b"
+const AlgoliaApplicationID string = "2Z19YUPYM0"
 
 func BotSupervisor(w http.ResponseWriter, r *http.Request) {
 	log.Println("Hit BotSupervisorPage Post Endpoint.")
@@ -91,14 +90,17 @@ func AlgoliaBot(w http.ResponseWriter, r *http.Request) {
 		opt.HitsPerPage(10),
 	}
 
-	res, err := index.Search("Travel", params...)
+	res, err := index.Search("Education", params...)
+
+	var results []interface{}
+
 	if err != nil {
 		log.Println(err)
 	} else {
 		for _, v := range res.Hits {
-			fmt.Println(v["Title"])
+			results = append(results, v["Title"])
 		}
-
 	}
 
+	json.NewEncoder(w).Encode(results)
 }
