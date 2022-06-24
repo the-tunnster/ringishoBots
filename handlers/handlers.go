@@ -23,7 +23,9 @@ func BotSupervisor(w http.ResponseWriter, r *http.Request) {
 	log.Println("Hit BotSupervisorPage Post Endpoint.")
 
 	var req models.Question
+
 	err := json.NewDecoder(r.Body).Decode(&req)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -51,7 +53,7 @@ func TravelBot(w http.ResponseWriter, r *http.Request) {
 
 	googleClient, err := maps.NewClient(maps.WithAPIKey(KEY))
 	if err != nil {
-		log.Fatal("Error creating maps client")
+		log.Fatal("Error creating maps client : ", err)
 	}
 
 	geocodeReq := &maps.GeocodingRequest{
@@ -60,7 +62,7 @@ func TravelBot(w http.ResponseWriter, r *http.Request) {
 
 	geocodeRes, err := googleClient.Geocode(context.Background(), geocodeReq)
 	if err != nil {
-		log.Fatal("Wack.")
+		log.Fatal("Error recieving geocodeResponse : ", err)
 	}
 
 	nearbyReq := &maps.NearbySearchRequest{
@@ -71,7 +73,7 @@ func TravelBot(w http.ResponseWriter, r *http.Request) {
 
 	nearbyRes, err := googleClient.NearbySearch(context.Background(), nearbyReq)
 	if err != nil {
-		log.Println("ded")
+		log.Println("Error recieveing nearbySearchResponse : ", err)
 	}
 
 	var results []string
@@ -93,7 +95,15 @@ func AlgoliaBot(w http.ResponseWriter, r *http.Request) {
 		opt.HitsPerPage(10),
 	}
 
-	res, err := index.Search("Education", params...)
+	var req models.Question
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	keyword := req.BotParameters
+
+	res, err := index.Search(keyword, params...)
 
 	var results []interface{}
 
@@ -115,7 +125,7 @@ func FirebaseConnector(w http.ResponseWriter, r *http.Request) {
 		DatabaseURL: "enter database url here",
 	}
 
-	opt := option.WithCredentialsFile("flowing-castle-324702-firebase-adminsdk-w2xqe-5a73d0d705.json")
+	opt := option.WithCredentialsFile("credentials.json")
 
 	app, err := firebase.NewApp(ctx, conf, opt)
 	if err != nil {
